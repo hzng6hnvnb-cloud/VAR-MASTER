@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غرفة VAR</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="app">
+
+    <!-- الصفحة الرئيسية -->
+    <section id="home" class="screen active">
+
+        <div class="top-logo">
+            <div class="var-icon">VAR</div>
+        </div>
+
+        <div class="hero">
+            <span class="eyebrow">اختبار التحكيم</span>
+            <h1>غرفة VAR</h1>
+            <p>
+                50 مرحلة من أصعب الحالات التحكيمية.
+                هل تملك عين الحكم؟
+            </p>
+        </div>
+
+        <div class="progress-card">
+            <div class="progress-info">
+                <span>تقدمك</span>
+                <strong id="homeProgress">0 / 50</strong>
+            </div>
+
+            <div class="progress-bar">
+                <div id="homeProgressBar"></div>
+            </div>
+        </div>
+
+        <button id="startButton" class="primary-button">
+            <span>ابدأ الاختبار</span>
+            <b>→</b>
+        </button>
+
+        <div class="home-info">
+            <div>
+                <strong>50</strong>
+                <span>مرحلة</span>
+            </div>
+
+            <div>
+                <strong>⚡</strong>
+                <span>صعوبة متدرجة</span>
+            </div>
+
+            <div>
+                <strong>🏆</strong>
+                <span>تقييم نهائي</span>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- شاشة اختيار المراحل -->
+    <section id="levels" class="screen">
+
+        <header class="page-header">
+            <button id="backHome" class="icon-button">←</button>
+
+            <div>
+                <span>اختبار التحكيم</span>
+                <h2>المراحل</h2>
+            </div>
+        </header>
+
+        <div class="levels-progress">
+            <span>التقدم</span>
+            <strong id="levelsProgress">0 / 50</strong>
+        </div>
+
+        <div id="levelsGrid" class="levels-grid"></div>
+
+    </section>
+
+
+    <!-- شاشة اللعب -->
+    <section id="game" class="screen">
+
+        <header class="game-header">
+
+            <div>
+                <span>المرحلة</span>
+                <strong id="stageNumber">01</strong>
+            </div>
+
+            <div class="score-display">
+                <span>النقاط</span>
+                <strong id="score">0</strong>
+            </div>
+
+            <div>
+                <span>الصعوبة</span>
+                <strong id="difficulty">سهل</strong>
+            </div>
+
+        </header>
+
+
+        <div class="video-area">
+
+            <div class="video-top">
+                <span class="live-dot"></span>
+                <span>مراجعة VAR</span>
+
+                <span id="minute">73:42</span>
+            </div>
+
+            <div class="pitch">
+
+                <div class="pitch-lines"></div>
+
+                <div class="player player-one"></div>
+                <div class="player player-two"></div>
+                <div class="player player-three"></div>
+
+                <div id="incident" class="incident">
+                    ⚽
+                </div>
+
+                <div class="var-frame">
+                    <span>REVIEW</span>
+                </div>
+
+            </div>
+
+            <div class="video-controls">
+                <button id="rewind">↶</button>
+                <div class="fake-progress">
+                    <span></span>
+                </div>
+                <button id="forward">↷</button>
+            </div>
+
+        </div>
+
+
+        <div class="case-card">
+
+            <div class="case-label">
+                🚨 الحالة التحكيمية
+            </div>
+
+            <h2 id="caseTitle">
+                هل توجد مخالفة؟
+            </h2>
+
+            <p id="caseDescription">
+                راجع الحالة جيدًا ثم اتخذ قرارك.
+            </p>
+
+        </div>
+
+
+        <div id="answers" class="answers"></div>
+
+
+        <div id="resultBox" class="result-box hidden">
+
+            <div id="resultIcon" class="result-icon">✓</div>
+
+            <div>
+                <strong id="resultTitle">إجابة صحيحة</strong>
+                <p id="resultDescription"></p>
+            </div>
+
+        </div>
+
+
+        <button id="nextButton" class="next-button hidden">
+            المرحلة التالية
+            <span>→</span>
+        </button>
+
+    </section>
+
+
+    <!-- الشاشة النهائية -->
+    <section id="final" class="screen final-screen">
+
+        <div class="trophy">🏆</div>
+
+        <span class="eyebrow">اكتمل الاختبار</span>
+
+        <h1>أحسنت يا حكم!</h1>
+
+        <p>
+            أكملت جميع مراحل اختبار التحكيم.
+        </p>
+
+        <div class="final-score-card">
+
+            <span>نتيجتك</span>
+
+            <div>
+                <strong id="finalScore">0</strong>
+                <small>/ 50</small>
+            </div>
+
+            <div class="final-bar">
+                <span id="finalBar"></span>
+            </div>
+
+            <strong id="finalRank" class="final-rank">
+                حكم جيد
+            </strong>
+
+            <p id="finalMessage"></p>
+
+        </div>
+
+        <button id="restartButton" class="primary-button">
+            إعادة الاختبار
+        </button>
+
+    </section>
+
+</div>
+
+
+<!-- انتقال المرحلة -->
+<div id="transition">
+
+    <div class="transition-line"></div>
+
+    <span>VAR</span>
+
+    <strong id="transitionStage">
+        المرحلة 01
+    </strong>
+
+    <small>
+        جاري تجهيز الحالة...
+    </small>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
