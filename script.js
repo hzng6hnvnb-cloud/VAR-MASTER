@@ -1,656 +1,1037 @@
-const home = document.getElementById("home");
-const levels = document.getElementById("levels");
-const game = document.getElementById("game");
-const finalScreen = document.getElementById("final");
+"use strict";
 
-const startButton = document.getElementById("startButton");
-const backHome = document.getElementById("backHome");
-const restartButton = document.getElementById("restartButton");
+/*
+  VAR MASTER
+  لعبة تحكيم فيديو تفاعلية
+*/
 
-const levelsGrid = document.getElementById("levelsGrid");
+const TOTAL_STAGES = 50;
+
+const stages = [
+  {
+    title: "هل الكرة دخلت المرمى؟",
+    question: "هل تحتسب الهدف؟",
+    answer: "goal",
+    reason: "الكرة تجاوزت خط المرمى بالكامل.",
+    type: "goal",
+    difficulty: "سهل",
+    speed: 1
+  },
+  {
+    title: "تسلل واضح",
+    question: "ما القرار الصحيح؟",
+    answer: "offside",
+    reason: "المهاجم كان متقدمًا على آخر مدافع لحظة تمرير الكرة.",
+    type: "offside",
+    difficulty: "سهل",
+    speed: 1
+  },
+  {
+    title: "لا يوجد تسلل",
+    question: "هل يوجد تسلل؟",
+    answer: "no-offside",
+    reason: "المهاجم كان على نفس خط آخر مدافع لحظة التمريرة.",
+    type: "no-offside",
+    difficulty: "سهل",
+    speed: 1
+  },
+  {
+    title: "احتكاك داخل المنطقة",
+    question: "هل تحتسب ركلة جزاء؟",
+    answer: "penalty",
+    reason: "المدافع عرقل المهاجم داخل منطقة الجزاء.",
+    type: "penalty",
+    difficulty: "سهل",
+    speed: 1
+  },
+  {
+    title: "احتكاك قانوني",
+    question: "هل توجد ركلة جزاء؟",
+    answer: "no-penalty",
+    reason: "الاحتكاك كان ضمن الالتحام القانوني ولا توجد مخالفة.",
+    type: "no-penalty",
+    difficulty: "سهل",
+    speed: 1
+  },
+
+  {
+    title: "لمسة يد داخل المنطقة",
+    question: "ما قرارك؟",
+    answer: "penalty",
+    reason: "اليد جعلت الجسم أكبر بشكل غير قانوني وتسببت في إيقاف الهجمة.",
+    type: "hand",
+    difficulty: "سهل",
+    speed: 1
+  },
+  {
+    title: "لمسة يد غير مخالفة",
+    question: "هل تحتسب ركلة جزاء؟",
+    answer: "no-penalty",
+    reason: "وضع الذراع كان طبيعيًا ولم تكن هناك مخالفة يد.",
+    type: "hand-no",
+    difficulty: "سهل",
+    speed: 1
+  },
+  {
+    title: "تدخل متأخر",
+    question: "ما العقوبة؟",
+    answer: "yellow",
+    reason: "التدخل متأخر ويستحق بطاقة صفراء.",
+    type: "yellow",
+    difficulty: "متوسط",
+    speed: .95
+  },
+  {
+    title: "تدخل خطير",
+    question: "ما العقوبة؟",
+    answer: "red",
+    reason: "التدخل كان خطيرًا بصورة تستوجب الطرد.",
+    type: "red",
+    difficulty: "متوسط",
+    speed: .9
+  },
+  {
+    title: "هدف بعد لمسة مدافع",
+    question: "هل الهدف صحيح؟",
+    answer: "goal",
+    reason: "المدافع هو من لعب الكرة قبل وصولها للمهاجم.",
+    type: "goal",
+    difficulty: "متوسط",
+    speed: .95
+  },
+
+  {
+    title: "تسلل قبل تسجيل الهدف",
+    question: "هل يحتسب الهدف؟",
+    answer: "offside",
+    reason: "المهاجم كان في موقف تسلل عند لحظة لعب زميله للكرة.",
+    type: "offside",
+    difficulty: "متوسط",
+    speed: .9
+  },
+  {
+    title: "الكرة خرجت قبل الهدف",
+    question: "ما القرار؟",
+    answer: "no-goal",
+    reason: "الكرة تجاوزت خط التماس قبل بناء الهجمة.",
+    type: "no-goal",
+    difficulty: "متوسط",
+    speed: .9
+  },
+  {
+    title: "تدخل داخل منطقة الجزاء",
+    question: "ركلة جزاء أم لا؟",
+    answer: "penalty",
+    reason: "المخالفة حدثت داخل منطقة الجزاء.",
+    type: "penalty",
+    difficulty: "متوسط",
+    speed: .9
+  },
+  {
+    title: "مخالفة خارج المنطقة",
+    question: "هل تحتسب ركلة جزاء؟",
+    answer: "no-penalty",
+    reason: "مكان المخالفة كان خارج منطقة الجزاء.",
+    type: "no-penalty",
+    difficulty: "متوسط",
+    speed: .9
+  },
+  {
+    title: "تدخل يستحق الإنذار",
+    question: "هل تعطي بطاقة صفراء؟",
+    answer: "yellow",
+    reason: "التدخل يوقف هجمة واعدة ويستحق الإنذار.",
+    type: "yellow",
+    difficulty: "متوسط",
+    speed: .85
+  },
+
+  {
+    title: "فرصة محققة وتدخل خطير",
+    question: "ما القرار؟",
+    answer: "red",
+    reason: "التدخل حرم الخصم من فرصة تسجيل محققة ويستوجب العقوبة المناسبة.",
+    type: "red",
+    difficulty: "صعب",
+    speed: .85
+  },
+  {
+    title: "المهاجم خلف المدافع",
+    question: "هل يوجد تسلل؟",
+    answer: "no-offside",
+    reason: "المهاجم كان خلف خط آخر مدافع عند لعب الكرة.",
+    type: "no-offside",
+    difficulty: "صعب",
+    speed: .8
+  },
+  {
+    title: "المهاجم متقدم بجزء من الجسم",
+    question: "ما قرارك؟",
+    answer: "offside",
+    reason: "جزء من الجسم يمكن تسجيل الهدف به كان في موقف تسلل.",
+    type: "offside",
+    difficulty: "صعب",
+    speed: .8
+  },
+  {
+    title: "تسلل بعد ارتداد الكرة",
+    question: "هل يوجد تسلل؟",
+    answer: "offside",
+    reason: "الموقف يُقاس عند لحظة لعب زميله للكرة وليس عند الارتداد اللاحق.",
+    type: "offside",
+    difficulty: "صعب",
+    speed: .8
+  },
+  {
+    title: "تغيير اتجاه الكرة",
+    question: "هل تحتسب الهدف؟",
+    answer: "goal",
+    reason: "تغيير اتجاه الكرة لم يلغِ صحة بناء الهجمة.",
+    type: "goal",
+    difficulty: "صعب",
+    speed: .8
+  },
+
+  {
+    title: "يد في منطقة الجزاء",
+    question: "ما القرار؟",
+    answer: "penalty",
+    reason: "المدافع استخدم ذراعه بطريقة غير قانونية داخل المنطقة.",
+    type: "hand",
+    difficulty: "صعب",
+    speed: .75
+  },
+  {
+    title: "كرة اصطدمت باليد من مسافة قصيرة",
+    question: "هل توجد ركلة جزاء؟",
+    answer: "no-penalty",
+    reason: "الموقف لا يثبت مخالفة يد لمجرد حدوث التلامس.",
+    type: "hand-no",
+    difficulty: "صعب",
+    speed: .75
+  },
+  {
+    title: "احتكاك بين مهاجم ومدافع",
+    question: "هل تحتسب ركلة جزاء؟",
+    answer: "penalty",
+    reason: "المدافع تسبب في إسقاط المهاجم داخل المنطقة.",
+    type: "penalty",
+    difficulty: "صعب",
+    speed: .75
+  },
+  {
+    title: "المهاجم يسقط دون مخالفة",
+    question: "ما قرارك؟",
+    answer: "no-penalty",
+    reason: "السقوط حدث دون مخالفة واضحة من المدافع.",
+    type: "no-penalty",
+    difficulty: "صعب",
+    speed: .75
+  },
+  {
+    title: "مرفق أثناء الالتحام",
+    question: "هل تستحق اللقطة بطاقة؟",
+    answer: "yellow",
+    reason: "الاحتكاك يستوجب العقوبة الانضباطية المناسبة.",
+    type: "yellow",
+    difficulty: "صعب",
+    speed: .7
+  },
+
+  {
+    title: "تدخل بعنف شديد",
+    question: "ما العقوبة؟",
+    answer: "red",
+    reason: "استخدام القوة المفرطة يجعل الحالة من حالات الطرد.",
+    type: "red",
+    difficulty: "صعب",
+    speed: .7
+  },
+  {
+    title: "هدف من وضع تسلل",
+    question: "هل تحتسب الهدف؟",
+    answer: "offside",
+    reason: "المهاجم المتسلل شارك بشكل مؤثر في الهجمة.",
+    type: "offside",
+    difficulty: "صعب",
+    speed: .7
+  },
+  {
+    title: "المهاجم لم يتدخل في اللعب",
+    question: "هل يوجد تسلل مؤثر؟",
+    answer: "no-offside",
+    reason: "وجود اللاعب في المنطقة لم يكن كافيًا وحده لإثبات مخالفة تسلل.",
+    type: "no-offside",
+    difficulty: "صعب",
+    speed: .7
+  },
+  {
+    title: "الكرة على خط المرمى",
+    question: "هل تجاوزت الكرة الخط بالكامل؟",
+    answer: "no-goal",
+    reason: "الكرة لم تتجاوز خط المرمى بالكامل.",
+    type: "no-goal",
+    difficulty: "صعب",
+    speed: .65
+  },
+  {
+    title: "الكرة عبرت الخط بالكامل",
+    question: "هل تحتسب الهدف؟",
+    answer: "goal",
+    reason: "الكرة تجاوزت خط المرمى بالكامل قبل إبعادها.",
+    type: "goal",
+    difficulty: "صعب",
+    speed: .65
+  },
+
+  {
+    title: "تسلل بفارق بسيط",
+    question: "هل يوجد تسلل؟",
+    answer: "offside",
+    reason: "المهاجم كان متقدمًا عند لحظة تمرير الكرة.",
+    type: "offside",
+    difficulty: "خبير",
+    speed: .6
+  },
+  {
+    title: "على نفس الخط",
+    question: "ما القرار؟",
+    answer: "no-offside",
+    reason: "لا يُعد اللاعب متسللًا عندما يكون على نفس خط المدافع.",
+    type: "no-offside",
+    difficulty: "خبير",
+    speed: .6
+  },
+  {
+    title: "تداخل مع الحارس",
+    question: "هل تحتسب الهدف؟",
+    answer: "no-goal",
+    reason: "تداخل المهاجم مع الحارس أثّر في قدرته على لعب الكرة.",
+    type: "no-goal",
+    difficulty: "خبير",
+    speed: .6
+  },
+  {
+    title: "المدافع لعب الكرة عمدًا",
+    question: "هل تستمر الهجمة؟",
+    answer: "goal",
+    reason: "اللعب المتعمد من المدافع يؤثر في تقييم موقف التسلل.",
+    type: "goal",
+    difficulty: "خبير",
+    speed: .55
+  },
+  {
+    title: "ركلة جزاء بعد مراجعة",
+    question: "هل تحتسب ركلة الجزاء؟",
+    answer: "penalty",
+    reason: "المراجعة أوضحت وجود مخالفة داخل المنطقة.",
+    type: "penalty",
+    difficulty: "خبير",
+    speed: .55
+  },
+
+  {
+    title: "احتكاك بسيط جدًا",
+    question: "هل تحتسب ركلة جزاء؟",
+    answer: "no-penalty",
+    reason: "الاحتكاك وحده لا يعني وجود مخالفة تستوجب ركلة جزاء.",
+    type: "no-penalty",
+    difficulty: "خبير",
+    speed: .55
+  },
+  {
+    title: "بطاقة صفراء أم حمراء؟",
+    question: "ما العقوبة المناسبة؟",
+    answer: "yellow",
+    reason: "التدخل لا يصل إلى مستوى الطرد في هذه الحالة.",
+    type: "yellow",
+    difficulty: "خبير",
+    speed: .5
+  },
+  {
+    title: "بطاقة حمراء بعد مراجعة",
+    question: "ما قرارك؟",
+    answer: "red",
+    reason: "المراجعة أظهرت أن التدخل يستوجب الطرد.",
+    type: "red",
+    difficulty: "خبير",
+    speed: .5
+  },
+  {
+    title: "هدف أم تسلل؟",
+    question: "هل تحتسب الهدف؟",
+    answer: "offside",
+    reason: "المهاجم كان متقدمًا لحظة تمرير الكرة.",
+    type: "offside",
+    difficulty: "خبير",
+    speed: .5
+  },
+  {
+    title: "لا تسلل رغم السرعة",
+    question: "ما قرارك؟",
+    answer: "no-offside",
+    reason: "اللاعب انطلق من موقف قانوني.",
+    type: "no-offside",
+    difficulty: "خبير",
+    speed: .5
+  },
+
+  {
+    title: "مراجعة خط المرمى",
+    question: "هل الكرة عبرت بالكامل؟",
+    answer: "goal",
+    reason: "الإعادة توضح أن الكرة عبرت الخط بالكامل.",
+    type: "goal",
+    difficulty: "خبير",
+    speed: .45
+  },
+  {
+    title: "لم تعبر بالكامل",
+    question: "ما القرار؟",
+    answer: "no-goal",
+    reason: "جزء من الكرة بقي فوق خط المرمى.",
+    type: "no-goal",
+    difficulty: "خبير",
+    speed: .45
+  },
+  {
+    title: "يد حاسمة",
+    question: "هل تحتسب ركلة جزاء؟",
+    answer: "penalty",
+    reason: "اللمسة باليد كانت مؤثرة في مسار اللعب داخل المنطقة.",
+    type: "hand",
+    difficulty: "خبير",
+    speed: .45
+  },
+  {
+    title: "لمسة لا تستوجب الجزاء",
+    question: "ما قرارك؟",
+    answer: "no-penalty",
+    reason: "لا توجد مخالفة يد تستوجب ركلة جزاء في هذه الحالة.",
+    type: "hand-no",
+    difficulty: "خبير",
+    speed: .45
+  },
+  {
+    title: "تدخل قوي لكن غير مفرط",
+    question: "ما العقوبة؟",
+    answer: "yellow",
+    reason: "التدخل يستحق الإنذار وليس الطرد.",
+    type: "yellow",
+    difficulty: "خبير",
+    speed: .4
+  },
+
+  {
+    title: "تدخل بقوة مفرطة",
+    question: "هل تطرد اللاعب؟",
+    answer: "red",
+    reason: "استخدام القوة المفرطة يستوجب البطاقة الحمراء.",
+    type: "red",
+    difficulty: "خبير",
+    speed: .4
+  },
+  {
+    title: "أصعب تسلل",
+    question: "ما القرار بعد الخطوط؟",
+    answer: "offside",
+    reason: "خطوط المراجعة تؤكد وجود موقف تسلل لحظة لعب الكرة.",
+    type: "offside",
+    difficulty: "أسطوري",
+    speed: .35
+  },
+  {
+    title: "أصعب حالة بدون تسلل",
+    question: "هل تلغي الهدف؟",
+    answer: "no-offside",
+    reason: "الإعادة والزاوية الثانية تؤكدان أن المهاجم كان في موقف قانوني.",
+    type: "no-offside",
+    difficulty: "أسطوري",
+    speed: .35
+  },
+  {
+    title: "قرار جزاء في اللحظة الأخيرة",
+    question: "هل تحتسب ركلة الجزاء؟",
+    answer: "penalty",
+    reason: "المراجعة تبين وجود مخالفة داخل منطقة الجزاء.",
+    type: "penalty",
+    difficulty: "أسطوري",
+    speed: .3
+  },
+  {
+    title: "اللقطة الأخيرة",
+    question: "هل تحتسب الهدف؟",
+    answer: "goal",
+    reason: "المراجعة النهائية تؤكد صحة الهدف.",
+    type: "goal",
+    difficulty: "أسطوري",
+    speed: .25
+  }
+];
+
+let currentStage = 0;
+let score = 0;
+let correct = 0;
+let wrong = 0;
+
+let playing = false;
+let animationStart = 0;
+let animationFrame = null;
+let speed = 1;
+let elapsed = 0;
+
+const homeScreen = document.getElementById("homeScreen");
+const gameScreen = document.getElementById("gameScreen");
+const finalScreen = document.getElementById("finalScreen");
+
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+const backBtn = document.getElementById("backBtn");
 
 const stageNumber = document.getElementById("stageNumber");
 const difficulty = document.getElementById("difficulty");
-const scoreDisplay = document.getElementById("score");
-
 const caseTitle = document.getElementById("caseTitle");
-const caseDescription = document.getElementById("caseDescription");
-const answers = document.getElementById("answers");
+const question = document.getElementById("question");
 
-const resultBox = document.getElementById("resultBox");
+const scoreEl = document.getElementById("score");
+const timeDisplay = document.getElementById("timeDisplay");
+const progressBar = document.getElementById("progressBar");
+const playState = document.getElementById("playState");
+
+const playBtn = document.getElementById("playBtn");
+const replayBtn = document.getElementById("replayBtn");
+const slowBtn = document.getElementById("slowBtn");
+const varBtn = document.getElementById("varBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const result = document.getElementById("result");
 const resultIcon = document.getElementById("resultIcon");
 const resultTitle = document.getElementById("resultTitle");
-const resultDescription = document.getElementById("resultDescription");
+const resultText = document.getElementById("resultText");
 
-const nextButton = document.getElementById("nextButton");
+const ball = document.getElementById("ball");
+const player1 = document.getElementById("player1");
+const player2 = document.getElementById("player2");
+const player3 = document.getElementById("player3");
+const player4 = document.getElementById("player4");
+const keeper = document.getElementById("keeper");
+const referee = document.getElementById("referee");
+const offsideLine = document.getElementById("offsideLine");
+const impact = document.getElementById("impact");
+const varFrame = document.getElementById("varFrame");
+const cameraLabel = document.getElementById("cameraLabel");
 
 const transition = document.getElementById("transition");
-const transitionStage = document.getElementById("transitionStage");
 
-const homeProgress = document.getElementById("homeProgress");
-const homeProgressBar = document.getElementById("homeProgressBar");
-const levelsProgress = document.getElementById("levelsProgress");
-
-const finalScore = document.getElementById("finalScore");
-const finalBar = document.getElementById("finalBar");
-const finalRank = document.getElementById("finalRank");
-const finalMessage = document.getElementById("finalMessage");
-
-let currentStage = 1;
-let correctAnswers = 0;
-let score = 0;
-
-let completedStages =
-    Number(localStorage.getItem("varCompletedStages")) || 0;
-
-
-/*
-    الـ50 مرحلة
-*/
-
-const cases = [
-
-    ["هل يوجد تسلل؟", "المهاجم تجاوز آخر مدافع بجزء بسيط من جسمه لحظة تمرير الكرة.", "تسلل", "لا يوجد تسلل"],
-
-    ["هل تحتسب ركلة جزاء؟", "حدث احتكاك داخل منطقة الجزاء وسقط المهاجم.", "ركلة جزاء", "استمرار اللعب"],
-
-    ["هل الهدف صحيح؟", "الكرة تجاوزت خط المرمى بالكامل قبل أن يخرجها المدافع.", "هدف", "لا يوجد هدف"],
-
-    ["هل توجد لمسة يد؟", "الكرة اصطدمت بذراع اللاعب داخل منطقة الجزاء.", "لمسة يد", "استمرار اللعب"],
-
-    ["هل يستحق اللاعب بطاقة؟", "دخل اللاعب على الخصم بتدخل متهور.", "بطاقة صفراء", "لا بطاقة"],
-
-    ["هل يوجد تسلل؟", "المهاجم كان في موقف تسلل لكنه لم يشارك في اللعب.", "لا يوجد تسلل", "تسلل"],
-
-    ["هل تحتسب ركلة جزاء؟", "المدافع لمس الكرة أولًا ثم حدث احتكاك مع المهاجم.", "استمرار اللعب", "ركلة جزاء"],
-
-    ["هل الهدف صحيح؟", "المهاجم استلم الكرة من زميله وكان متقدمًا قليلًا عن المدافع الأخير.", "لا يوجد هدف", "هدف"],
-
-    ["هل تستحق الحالة بطاقة حمراء؟", "تدخل قوي أدى إلى تعريض سلامة الخصم للخطر.", "بطاقة حمراء", "بطاقة صفراء"],
-
-    ["هل توجد لمسة يد؟", "الكرة ارتدت من جسم اللاعب ثم لمست ذراعه.", "استمرار اللعب", "لمسة يد"],
-
-    ["هل يوجد تسلل؟", "قدم المهاجم كانت على نفس خط آخر مدافع لحظة التمرير.", "لا يوجد تسلل", "تسلل"],
-
-    ["هل تحتسب ركلة جزاء؟", "المدافع أمسك بقميص المهاجم داخل منطقة الجزاء.", "ركلة جزاء", "استمرار اللعب"],
-
-    ["هل الهدف صحيح؟", "المهاجم لمس الكرة بيده قبل تسجيل الهدف.", "لا يوجد هدف", "هدف"],
-
-    ["هل تستحق بطاقة حمراء؟", "اللاعب منع فرصة تسجيل واضحة بارتكاب مخالفة متعمدة.", "بطاقة حمراء", "بطاقة صفراء"],
-
-    ["هل يوجد تسلل؟", "المهاجم كان متقدمًا لكن الكرة وصلت إليه بعد ارتدادها من الخصم.", "لا يوجد تسلل", "تسلل"],
-
-    ["هل تحتسب ركلة جزاء؟", "الاحتكاك حدث خارج منطقة الجزاء مباشرة.", "لا توجد ركلة جزاء", "ركلة جزاء"],
-
-    ["هل الهدف صحيح؟", "الحارس أمسك الكرة ثم دخل بها إلى داخل المرمى.", "هدف", "لا يوجد هدف"],
-
-    ["هل توجد لمسة يد؟", "ذراع اللاعب كانت في وضع طبيعي وقريبة من جسمه.", "استمرار اللعب", "لمسة يد"],
-
-    ["هل يستحق اللاعب بطاقة؟", "أوقف هجمة واعدة بمخالفة تكتيكية.", "بطاقة صفراء", "لا بطاقة"],
-
-    ["هل يوجد تسلل؟", "اللاعب استلم الكرة وهو خلف آخر مدافع لكنه كان في نصف ملعبه.", "لا يوجد تسلل", "تسلل"],
-
-    ["هل تحتسب ركلة جزاء؟", "المهاجم تعمد ترك قدمه خلف المدافع للحصول على احتكاك.", "استمرار اللعب", "ركلة جزاء"],
-
-    ["هل الهدف صحيح؟", "المهاجم كان في موقف تسلل لكنه لم يلمس الكرة، والحارس أخطأ في التعامل معها.", "يعتمد على الحالة", "هدف دائمًا"],
-
-    ["هل توجد لمسة يد؟", "الكرة اصطدمت بذراع اللاعب بعد أن حاول إبعادها عن جسمه.", "لمسة يد", "استمرار اللعب"],
-
-    ["هل بطاقة حمراء؟", "التدخل كان باستخدام قوة مفرطة.", "بطاقة حمراء", "بطاقة صفراء"],
-
-    ["هل يوجد تسلل؟", "اللاعب كان أقرب للمرمى من الكرة لحظة تمريرها.", "تسلل", "لا يوجد تسلل"],
-
-    ["هل تحتسب ركلة جزاء؟", "المهاجم سقط دون وجود احتكاك واضح.", "استمرار اللعب", "ركلة جزاء"],
-
-    ["هل الهدف صحيح؟", "الحكم أطلق صافرته قبل دخول الكرة للمرمى.", "لا يوجد هدف", "هدف"],
-
-    ["هل توجد لمسة يد؟", "الكرة ارتدت من يد زميل اللاعب ثم لمست يده مباشرة.", "استمرار اللعب", "لمسة يد"],
-
-    ["هل بطاقة صفراء؟", "اللاعب أوقف هجمة واعدة بعرقلة من الخلف.", "بطاقة صفراء", "لا بطاقة"],
-
-    ["هل يوجد تسلل؟", "جزء من جسم المهاجم القابل للتسجيل كان متقدمًا عن المدافع.", "تسلل", "لا يوجد تسلل"],
-
-    ["هل ركلة جزاء؟", "المدافع دفع المهاجم من الخلف داخل المنطقة.", "ركلة جزاء", "استمرار اللعب"],
-
-    ["هل الهدف صحيح؟", "المهاجم كان في موقف تسلل لكنه لم يتدخل في اللعب.", "هدف", "لا يوجد هدف"],
-
-    ["هل توجد لمسة يد؟", "الكرة ضربت كتف اللاعب ثم ذراعه.", "استمرار اللعب", "لمسة يد"],
-
-    ["هل بطاقة حمراء؟", "اللاعب استخدم قوة خطيرة جدًا أثناء التدخل.", "بطاقة حمراء", "بطاقة صفراء"],
-
-    ["هل يوجد تسلل؟", "المهاجم كان متقدمًا بجزء من قدمه فقط.", "تسلل", "لا يوجد تسلل"],
-
-    ["هل ركلة جزاء؟", "المهاجم وصل للكرة أولًا ثم أسقطه المدافع.", "ركلة جزاء", "استمرار اللعب"],
-
-    ["هل الهدف صحيح؟", "الكرة لم تتجاوز خط المرمى بالكامل.", "لا يوجد هدف", "هدف"],
-
-    ["هل توجد لمسة يد؟", "اليد كانت خلف الجسم والكرة اصطدمت بها من مسافة قريبة.", "استمرار اللعب", "لمسة يد"],
-
-    ["هل بطاقة صفراء؟", "اللاعب ارتكب مخالفة لإيقاف هجمة واعدة.", "بطاقة صفراء", "لا بطاقة"],
-
-    ["هل يوجد تسلل؟", "المهاجم كان على نفس مستوى ثاني آخر مدافع.", "لا يوجد تسلل", "تسلل"],
-
-    ["هل ركلة جزاء؟", "المدافع لمس قدم المهاجم قبل أن يلمس الكرة.", "ركلة جزاء", "استمرار اللعب"],
-
-    ["هل الهدف صحيح؟", "المهاجم سجل بعد ارتداد الكرة من القائم.", "هدف", "لا يوجد هدف"],
-
-    ["هل توجد لمسة يد؟", "اللاعب حرّك يده نحو الكرة بشكل واضح.", "لمسة يد", "استمرار اللعب"],
-
-    ["هل بطاقة حمراء؟", "اللاعب حرم الخصم من فرصة محققة بطريقة مخالفة.", "بطاقة حمراء", "بطاقة صفراء"],
-
-    ["هل يوجد تسلل؟", "المهاجم كان خلف الكرة لحظة التمرير.", "لا يوجد تسلل", "تسلل"],
-
-    ["هل ركلة جزاء؟", "الاحتكاك كان طبيعيًا أثناء محاولة لعب الكرة.", "استمرار اللعب", "ركلة جزاء"],
-
-    ["هل الهدف صحيح؟", "المهاجم سجل بقدمه دون وجود مخالفة قبل التسديد.", "هدف", "لا يوجد هدف"],
-
-    ["هل توجد لمسة يد؟", "اللاعب تعمد توسيع جسمه بذراعه ومنع الكرة.", "لمسة يد", "استمرار اللعب"],
-
-    ["هل بطاقة حمراء؟", "الحالة تتضمن تدخلًا عنيفًا جدًا في آخر مراحل المباراة.", "بطاقة حمراء", "بطاقة صفراء"]
-
-];
-
-
-/*
-    أصوات اللعبة
-    يتم توليدها من المتصفح بدون ملفات خارجية
-*/
-
-const audioContext =
-    new (window.AudioContext || window.webkitAudioContext)();
-
-
-function sound(frequency, duration, type = "sine") {
-
-    if (audioContext.state === "suspended") {
-        audioContext.resume();
-    }
-
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-    oscillator.type = type;
-    oscillator.frequency.value = frequency;
-
-    gain.gain.setValueAtTime(
-        0.0001,
-        audioContext.currentTime
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.18,
-        audioContext.currentTime + 0.02
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        audioContext.currentTime + duration
-    );
-
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
-
-    oscillator.start();
-    oscillator.stop(
-        audioContext.currentTime + duration
-    );
-}
-
-
-function correctSound() {
-
-    sound(523, .12);
-    setTimeout(() => sound(659, .12), 100);
-    setTimeout(() => sound(784, .2), 200);
-
-}
-
-
-function wrongSound() {
-
-    sound(220, .18, "sawtooth");
-    setTimeout(() => sound(150, .25, "sawtooth"), 130);
-
-}
-
-
-function transitionSound() {
-
-    sound(330, .08);
-    setTimeout(() => sound(440, .08), 80);
-    setTimeout(() => sound(660, .18), 160);
-
-}
-
-
-/*
-    الصفحة الرئيسية
-*/
-
-startButton.addEventListener("click", () => {
-
-    showLevels();
-
-});
-
-
-backHome.addEventListener("click", () => {
-
-    showScreen(home);
-
-});
-
+const answerButtons = document.querySelectorAll(".answer");
 
 function showScreen(screen) {
+  [homeScreen, gameScreen, finalScreen].forEach(s => {
+    s.classList.remove("active");
+  });
 
-    document.querySelectorAll(".screen")
-        .forEach(s => s.classList.remove("active"));
-
-    screen.classList.add("active");
-
+  screen.classList.add("active");
 }
 
-
-/*
-    المراحل
-*/
-
-function showLevels() {
-
-    showScreen(levels);
-
-    renderLevels();
-
-}
-
-
-function renderLevels() {
-
-    levelsGrid.innerHTML = "";
-
-    levelsProgress.textContent =
-        completedStages + " / 50";
-
-    for (let i = 1; i <= 50; i++) {
-
-        const button =
-            document.createElement("button");
-
-        button.className = "level";
-
-        button.textContent =
-            String(i).padStart(2, "0");
-
-        if (i <= completedStages) {
-
-            button.classList.add("completed");
-            button.innerHTML =
-                "✓";
-
-        }
-
-        if (i === completedStages + 1) {
-
-            button.classList.add("unlocked");
-            button.classList.add("current");
-
-        }
-
-        if (i > completedStages + 1) {
-
-            button.classList.add("locked");
-            button.textContent = "🔒";
-
-        }
-
-        if (i <= completedStages + 1) {
-
-            button.addEventListener("click", () => {
-
-                currentStage = i;
-
-                startStage();
-
-            });
-
-        }
-
-        levelsGrid.appendChild(button);
-
-    }
-
-}
-
-
-/*
-    بداية المرحلة
-*/
-
-function startStage() {
-
-    showTransition(() => {
-
-        showScreen(game);
-
-        loadStage();
-
-    });
-
-}
-
-
-/*
-    الانتقال الفخم
-*/
-
-function showTransition(callback) {
-
-    transitionStage.textContent =
-        "المرحلة " +
-        String(currentStage).padStart(2, "0");
-
-    transition.classList.add("show");
-
-    transitionSound();
-
-    setTimeout(() => {
-
-        transition.classList.remove("show");
-
-        callback();
-
-    }, 1000);
-
-}
-
-
-/*
-    تحميل المرحلة
-*/
-
-function loadStage() {
-
-    const data =
-        cases[currentStage - 1];
-
-    stageNumber.textContent =
-        String(currentStage).padStart(2, "0");
-
-    scoreDisplay.textContent = score;
-
-    difficulty.textContent =
-        getDifficulty(currentStage);
-
-    caseTitle.textContent =
-        data[0];
-
-    caseDescription.textContent =
-        data[1];
-
-    answers.innerHTML = "";
-
-    resultBox.classList.add("hidden");
-    nextButton.classList.add("hidden");
-
-    data.slice(2).forEach(answer => {
-
-        const button =
-            document.createElement("button");
-
-        button.className = "answer";
-
-        button.textContent = answer;
-
-        button.addEventListener("click", () => {
-
-            chooseAnswer(button, answer);
-
-        });
-
-        answers.appendChild(button);
-
-    });
-
-}
-
-
-/*
-    مستوى الصعوبة
-*/
-
-function getDifficulty(stage) {
-
-    if (stage <= 10) return "سهل";
-    if (stage <= 20) return "متوسط";
-    if (stage <= 30) return "صعب";
-    if (stage <= 40) return "خبير";
-
-    return "نخبة";
-
-}
-
-
-/*
-    اختيار الإجابة
-*/
-
-function chooseAnswer(button, answer) {
-
-    const data =
-        cases[currentStage - 1];
-
-    const correctAnswer =
-        data[2];
-
-    const allButtons =
-        document.querySelectorAll(".answer");
-
-    allButtons.forEach(btn => {
-
-        btn.classList.add("disabled");
-
-    });
-
-
-    if (answer === correctAnswer) {
-
-        button.classList.add("correct");
-
-        correctAnswers++;
-
-        score += 100;
-
-        resultBox.classList.remove("hidden");
-
-        resultBox.classList.remove("wrong-result");
-
-        resultIcon.textContent = "✓";
-
-        resultTitle.textContent =
-            "إجابة صحيحة!";
-
-        resultDescription.textContent =
-            "قرار ممتاز. عين الحكم عندك قوية.";
-
-        correctSound();
+function beep(type) {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContext) return;
+
+    const ctx = new AudioContext();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === "correct") {
+      oscillator.frequency.value = 700;
+      gain.gain.value = .07;
+      oscillator.start();
+
+      setTimeout(() => {
+        oscillator.frequency.value = 900;
+      }, 100);
+
+      setTimeout(() => {
+        oscillator.stop();
+        ctx.close();
+      }, 230);
+
+    } else if (type === "wrong") {
+      oscillator.frequency.value = 220;
+      gain.gain.value = .08;
+      oscillator.start();
+
+      setTimeout(() => {
+        oscillator.frequency.value = 150;
+      }, 100);
+
+      setTimeout(() => {
+        oscillator.stop();
+        ctx.close();
+      }, 280);
 
     } else {
+      oscillator.frequency.value = 420;
+      gain.gain.value = .04;
+      oscillator.start();
 
-        button.classList.add("wrong");
-
-        allButtons.forEach(btn => {
-
-            if (btn.textContent === correctAnswer) {
-                btn.classList.add("correct");
-            }
-
-        });
-
-        resultBox.classList.remove("hidden");
-
-        resultBox.classList.add("wrong-result");
-
-        resultIcon.textContent = "×";
-
-        resultTitle.textContent =
-            "إجابة غير صحيحة";
-
-        resultDescription.textContent =
-            "القرار الصحيح هو: " +
-            correctAnswer;
-
-        wrongSound();
-
+      setTimeout(() => {
+        oscillator.stop();
+        ctx.close();
+      }, 120);
     }
 
-
-    scoreDisplay.textContent = score;
-
-    nextButton.classList.remove("hidden");
-
+  } catch (e) {}
 }
 
+function resetVisuals() {
+  offsideLine.classList.remove("show");
+  impact.classList.remove("show");
+  varFrame.classList.remove("show");
 
-/*
-    المرحلة التالية
-*/
+  cameraLabel.textContent = "الكاميرا الرئيسية";
 
-nextButton.addEventListener("click", () => {
+  player1.style.left = "35%";
+  player1.style.top = "45%";
 
-    if (currentStage >= 50) {
+  player2.style.left = "48%";
+  player2.style.top = "50%";
 
-        finishGame();
+  player3.style.left = "58%";
+  player3.style.top = "42%";
 
-        return;
+  player4.style.left = "66%";
+  player4.style.top = "58%";
 
+  keeper.style.left = "88%";
+  keeper.style.top = "50%";
+
+  referee.style.left = "51%";
+  referee.style.top = "18%";
+
+  ball.style.left = "25%";
+  ball.style.top = "50%";
+}
+
+function loadStage(index) {
+  currentStage = index;
+
+  const stage = stages[currentStage];
+
+  resetVisuals();
+
+  stageNumber.textContent = currentStage + 1;
+  difficulty.textContent = stage.difficulty;
+  caseTitle.textContent = stage.title;
+  question.textContent = stage.question;
+
+  scoreEl.textContent = score;
+
+  speed = stage.speed;
+
+  slowBtn.classList.remove("active");
+  playing = false;
+  elapsed = 0;
+
+  playBtn.textContent = "▶ تشغيل";
+  playState.textContent = "جاهز";
+
+  progressBar.style.width = "0%";
+  timeDisplay.textContent = "00:00";
+
+  result.className = "result hidden";
+  nextBtn.classList.add("hidden");
+
+  answerButtons.forEach(btn => {
+    btn.classList.remove("disabled", "correct", "wrong");
+  });
+
+  cancelAnimationFrame(animationFrame);
+}
+
+function startAnimation() {
+  if (playing) {
+    playing = false;
+    playBtn.textContent = "▶ تشغيل";
+    playState.textContent = "متوقف";
+    return;
+  }
+
+  playing = true;
+  playBtn.textContent = "⏸ إيقاف";
+  playState.textContent = "تجري اللقطة";
+
+  animationStart = performance.now() - elapsed;
+
+  animationFrame = requestAnimationFrame(animate);
+}
+
+function animate(now) {
+  if (!playing) return;
+
+  elapsed = (now - animationStart) * speed;
+
+  const duration = 6000;
+  let progress = elapsed / duration;
+
+  if (progress >= 1) {
+    progress = 1;
+    playing = false;
+    playBtn.textContent = "▶ تشغيل";
+    playState.textContent = "انتهت اللقطة";
+  }
+
+  progressBar.style.width = `${progress * 100}%`;
+
+  const seconds = Math.min(6, Math.floor(elapsed / 1000));
+  timeDisplay.textContent = `00:0${seconds}`;
+
+  animateScene(progress);
+
+  if (playing) {
+    animationFrame = requestAnimationFrame(animate);
+  }
+}
+
+function animateScene(p) {
+  const stage = stages[currentStage];
+  const type = stage.type;
+
+  /*
+    حركة اللاعبين والكرة تختلف حسب نوع الحالة.
+  */
+
+  if (
+    type === "offside" ||
+    type === "no-offside"
+  ) {
+    player1.style.left = `${30 + p * 28}%`;
+    player1.style.top = `${48 - p * 5}%`;
+
+    player2.style.left = `${42 + p * 10}%`;
+    player2.style.top = `${53 - p * 3}%`;
+
+    player3.style.left = `${57 + p * 18}%`;
+    player3.style.top = `${42 + p * 5}%`;
+
+    player4.style.left = `${67 + p * 5}%`;
+    player4.style.top = "57%";
+
+    ball.style.left = `${25 + p * 53}%`;
+    ball.style.top = `${50 - p * 5}%`;
+
+    if (p > .58 && type === "offside") {
+      offsideLine.style.left = "63%";
     }
 
-    currentStage++;
+  } else if (
+    type === "penalty" ||
+    type === "no-penalty" ||
+    type === "hand" ||
+    type === "hand-no"
+  ) {
 
-    if (currentStage > completedStages) {
+    player1.style.left = `${25 + p * 47}%`;
+    player1.style.top = `${52 - p * 5}%`;
 
-        completedStages = currentStage - 1;
+    player2.style.left = `${46 + p * 22}%`;
+    player2.style.top = `${55 - p * 2}%`;
 
-        localStorage.setItem(
-            "varCompletedStages",
-            completedStages
-        );
+    player3.style.left = `${63 + p * 10}%`;
+    player3.style.top = `${43 + p * 5}%`;
 
+    ball.style.left = `${24 + p * 52}%`;
+    ball.style.top = `${55 - p * 7}%`;
+
+    if (p > .62 && p < .82) {
+      impact.classList.add("show");
+    } else {
+      impact.classList.remove("show");
     }
 
-    showTransition(() => {
+  } else if (
+    type === "yellow" ||
+    type === "red"
+  ) {
 
-        loadStage();
+    player1.style.left = `${30 + p * 30}%`;
+    player1.style.top = `${43 + p * 9}%`;
 
-    });
+    player2.style.left = `${48 + p * 17}%`;
+    player2.style.top = `${59 - p * 11}%`;
 
-});
+    player3.style.left = `${60 + p * 10}%`;
+    player3.style.top = "43%";
 
+    ball.style.left = `${30 + p * 35}%`;
+    ball.style.top = `${45 + p * 5}%`;
 
-/*
-    نهاية اللعبة
-*/
+    if (p > .55 && p < .72) {
+      impact.classList.add("show");
+    } else {
+      impact.classList.remove("show");
+    }
 
-function finishGame() {
+  } else {
 
-    completedStages = 50;
+    player1.style.left = `${25 + p * 40}%`;
+    player1.style.top = `${45 - p * 5}%`;
 
-    localStorage.setItem(
-        "varCompletedStages",
-        50
+    player2.style.left = `${43 + p * 20}%`;
+    player2.style.top = `${54 + p * 4}%`;
+
+    player3.style.left = `${58 + p * 12}%`;
+    player3.style.top = "40%";
+
+    player4.style.left = `${65 + p * 7}%`;
+    player4.style.top = "58%";
+
+    ball.style.left = `${25 + p * 60}%`;
+    ball.style.top = `${52 - p * 4}%`;
+
+    keeper.style.top = `${50 + Math.sin(p * Math.PI) * 8}%`;
+
+    if (p > .78 && type === "goal") {
+      impact.classList.add("show");
+    }
+  }
+
+  if (p > .98) {
+    playState.textContent = "انتهت اللقطة";
+  }
+}
+
+function replay() {
+  cancelAnimationFrame(animationFrame);
+
+  elapsed = 0;
+  playing = false;
+
+  resetVisuals();
+
+  playBtn.textContent = "▶ تشغيل";
+  playState.textContent = "إعادة اللقطة";
+  progressBar.style.width = "0%";
+  timeDisplay.textContent = "00:00";
+
+  setTimeout(() => {
+    startAnimation();
+  }, 180);
+}
+
+function toggleSlow() {
+  if (speed < 1) {
+    speed = 1;
+    slowBtn.classList.remove("active");
+    slowBtn.textContent = "🐢 بطيء";
+  } else {
+    speed = .35;
+    slowBtn.classList.add("active");
+    slowBtn.textContent = "🐢 بطيء ✓";
+  }
+}
+
+function openVAR() {
+  varFrame.classList.toggle("show");
+
+  if (varFrame.classList.contains("show")) {
+    cameraLabel.textContent = "مراجعة VAR";
+    playState.textContent = "زاوية المراجعة";
+
+    if (
+      stages[currentStage].type === "offside" ||
+      stages[currentStage].type === "no-offside"
+    ) {
+      offsideLine.classList.add("show");
+    }
+
+    beep("normal");
+
+  } else {
+    cameraLabel.textContent = "الكاميرا الرئيسية";
+    playState.textContent = "جاهز";
+    offsideLine.classList.remove("show");
+  }
+}
+
+function checkAnswer(selected) {
+  const stage = stages[currentStage];
+
+  if (
+    result.classList.contains("correct") ||
+    result.classList.contains("wrong")
+  ) {
+    return;
+  }
+
+  playing = false;
+  cancelAnimationFrame(animationFrame);
+
+  playBtn.textContent = "▶ تشغيل";
+
+  answerButtons.forEach(btn => {
+    btn.classList.add("disabled");
+
+    if (btn.dataset.answer === selected) {
+      btn.classList.add(
+        selected === stage.answer ? "correct" : "wrong"
+      );
+    }
+
+    if (
+      btn.dataset.answer === stage.answer &&
+      selected !== stage.answer
+    ) {
+      btn.classList.add("correct");
+    }
+  });
+
+  if (selected === stage.answer) {
+    correct++;
+
+    const points = Math.max(
+      10,
+      Math.round(100 * stage.speed)
     );
 
-    finalScore.textContent =
-        correctAnswers;
+    score += points;
 
-    finalBar.style.width =
-        ((correctAnswers / 50) * 100) + "%";
+    scoreEl.textContent = score;
 
+    result.className = "result correct";
 
-    if (correctAnswers >= 48) {
+    resultIcon.textContent = "✓";
+    resultTitle.textContent = "إجابة صحيحة!";
 
-        finalRank.textContent =
-            "🏆 حكم استثنائي";
+    resultText.textContent =
+      `${stage.reason} +${points} نقطة`;
 
-        finalMessage.textContent =
-            "قراراتك كانت على مستوى عالٍ جدًا. لديك عين ممتازة في قراءة الحالات التحكيمية.";
+    beep("correct");
 
-    } else if (correctAnswers >= 42) {
+  } else {
 
-        finalRank.textContent =
-            "👑 حكم ممتاز";
+    wrong++;
 
-        finalMessage.textContent =
-            "مستوى قوي جدًا في اتخاذ القرارات ومراجعة الحالات.";
+    result.className = "result wrong";
 
-    } else if (correctAnswers >= 35) {
+    resultIcon.textContent = "×";
+    resultTitle.textContent = "إجابة غير صحيحة";
 
-        finalRank.textContent =
-            "⭐ حكم جيد جدًا";
+    resultText.textContent =
+      `القرار الصحيح: ${getAnswerName(stage.answer)} — ${stage.reason}`;
 
-        finalMessage.textContent =
-            "لديك أساس ممتاز، ومع المزيد من التدريب ستصبح أقوى.";
+    beep("wrong");
+  }
 
-    } else if (correctAnswers >= 25) {
-
-        finalRank.textContent =
-            "⚽ حكم جيد";
-
-        finalMessage.textContent =
-            "أداء جيد، لكن بعض الحالات الصعبة تحتاج إلى تركيز أكثر.";
-
-    } else {
-
-        finalRank.textContent =
-            "📋 حكم تحت التدريب";
-
-        finalMessage.textContent =
-            "أكملت الاختبار، والآن تعرف الحالات التي تحتاج إلى تطويرها.";
-
-    }
-
-
-    showScreen(finalScreen);
-
-    sound(523, .15);
-
-    setTimeout(() => sound(659, .15), 150);
-
-    setTimeout(() => sound(784, .3), 300);
-
+  nextBtn.classList.remove("hidden");
 }
 
+function getAnswerName(answer) {
+  const names = {
+    "goal": "هدف",
+    "no-goal": "لا هدف",
+    "offside": "تسلل",
+    "no-offside": "لا يوجد تسلل",
+    "penalty": "ركلة جزاء",
+    "no-penalty": "لا توجد ركلة جزاء",
+    "yellow": "بطاقة صفراء",
+    "red": "بطاقة حمراء"
+  };
 
-/*
-    إعادة الاختبار
-*/
+  return names[answer] || answer;
+}
 
-restartButton.addEventListener("click", () => {
+function nextStage() {
 
-    currentStage = 1;
-    correctAnswers = 0;
-    score = 0;
+  if (currentStage >= TOTAL_STAGES - 1) {
+    showFinal();
+    return;
+  }
 
-    showLevels();
+  transition.classList.add("show");
 
+  setTimeout(() => {
+    transition.classList.remove("show");
+    loadStage(currentStage + 1);
+  }, 750);
+}
+
+function showFinal() {
+
+  document.getElementById("finalScore").textContent = correct;
+  document.getElementById("correctCount").textContent = correct;
+  document.getElementById("wrongCount").textContent = wrong;
+
+  let rank = "";
+  let message = "";
+
+  if (correct >= 48) {
+    rank = "حكم استثنائي";
+    message = "قراراتك كانت دقيقة جدًا. وصلت إلى مستوى استثنائي في مراجعة اللقطات.";
+  } else if (correct >= 42) {
+    rank = "حكم ممتاز";
+    message = "مستوى قوي جدًا في قراءة الحالات واتخاذ القرارات.";
+  } else if (correct >= 35) {
+    rank = "حكم محترف";
+    message = "قرارات ممتازة، لكن ما زالت هناك بعض اللقطات التي تحتاج تدقيقًا.";
+  } else if (correct >= 25) {
+    rank = "حكم جيد";
+    message = "أداء جيد. راجع اللقطات الصعبة وحاول مرة ثانية.";
+  } else {
+    rank = "تحتاج مراجعة";
+    message = "بداية جيدة. أعد التحدي وحاول قراءة كل لقطة ببطء.";
+  }
+
+  document.getElementById("finalRank").textContent = rank;
+  document.getElementById("finalMessage").textContent = message;
+
+  beep("correct");
+
+  showScreen(finalScreen);
+}
+
+startBtn.addEventListener("click", () => {
+  score = 0;
+  correct = 0;
+  wrong = 0;
+
+  showScreen(gameScreen);
+  loadStage(0);
 });
 
+restartBtn.addEventListener("click", () => {
+  score = 0;
+  correct = 0;
+  wrong = 0;
 
-/*
-    تحديث الصفحة الرئيسية
-*/
+  showScreen(gameScreen);
+  loadStage(0);
+});
 
-function updateHome() {
+backBtn.addEventListener("click", () => {
+  playing = false;
+  cancelAnimationFrame(animationFrame);
+  showScreen(homeScreen);
+});
 
-    homeProgress.textContent =
-        completedStages + " / 50";
+playBtn.addEventListener("click", startAnimation);
 
-    homeProgressBar.style.width =
-        ((completedStages / 50) * 100) + "%";
+replayBtn.addEventListener("click", replay);
 
-}
+slowBtn.addEventListener("click", toggleSlow);
 
-updateHome();
+varBtn.addEventListener("click", openVAR);
+
+nextBtn.addEventListener("click", nextStage);
+
+answerButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    checkAnswer(button.dataset.answer);
+  });
+});
+
+loadStage(0);
