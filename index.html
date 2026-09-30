@@ -1,253 +1,301 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>غرفة VAR</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07130f">
+  <title>VAR MASTER — محترف حكم الفيديو المساعد</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <div class="app">
 
-<div id="app">
+    <header class="topbar">
+      <div>
+        <div class="brand">VAR MASTER</div>
+        <div class="brand-sub">محترف حكم الفيديو المساعد</div>
+      </div>
 
-    <!-- الصفحة الرئيسية -->
-    <section id="home" class="screen active">
+      <div class="score-pill">
+        <span id="score">0</span>
+        <small>نقطة</small>
+      </div>
+    </header>
 
-        <div class="top-logo">
-            <div class="var-icon">VAR</div>
-        </div>
+    <main>
 
+      <section id="homeScreen" class="screen active">
         <div class="hero">
-            <span class="eyebrow">اختبار التحكيم</span>
-            <h1>غرفة VAR</h1>
-            <p>
-                50 مرحلة من أصعب الحالات التحكيمية.
-                هل تملك عين الحكم؟
-            </p>
+          <div class="hero-badge">⚽ غرفة المراجعة</div>
+          <h1>هل تملك <span>عين الحكم؟</span></h1>
+          <p>
+            شاهد اللقطة، أعدها، أوقفها، بطّئها، ثم اتخذ القرار الصحيح.
+          </p>
+
+          <button id="startBtn" class="primary-btn">
+            ابدأ التحدي
+          </button>
         </div>
 
-        <div class="progress-card">
-            <div class="progress-info">
-                <span>تقدمك</span>
-                <strong id="homeProgress">0 / 50</strong>
-            </div>
+        <div class="home-stats">
+          <div>
+            <strong>50</strong>
+            <span>مرحلة</span>
+          </div>
 
-            <div class="progress-bar">
-                <div id="homeProgressBar"></div>
-            </div>
+          <div>
+            <strong>5</strong>
+            <span>مستويات صعوبة</span>
+          </div>
+
+          <div>
+            <strong>VAR</strong>
+            <span>مراجعة</span>
+          </div>
         </div>
 
-        <button id="startButton" class="primary-button">
-            <span>ابدأ الاختبار</span>
-            <b>→</b>
-        </button>
+        <div class="rules-card">
+          <h3>كيف تلعب؟</h3>
+          <p>🎬 شاهد اللقطة كاملة.</p>
+          <p>🔁 أعدها إذا احتجت.</p>
+          <p>🐢 استخدم السرعة البطيئة للتدقيق.</p>
+          <p>📺 راجع قرار VAR.</p>
+          <p>⚖️ اختر القرار الذي تراه صحيحًا.</p>
+        </div>
+      </section>
 
-        <div class="home-info">
-            <div>
-                <strong>50</strong>
-                <span>مرحلة</span>
-            </div>
 
-            <div>
-                <strong>⚡</strong>
-                <span>صعوبة متدرجة</span>
-            </div>
+      <section id="gameScreen" class="screen">
 
-            <div>
-                <strong>🏆</strong>
-                <span>تقييم نهائي</span>
-            </div>
+        <div class="game-head">
+          <button id="backBtn" class="icon-btn">‹</button>
+
+          <div class="stage-title">
+            <span id="difficulty">سهل</span>
+            <strong>المرحلة <span id="stageNumber">1</span> / 50</strong>
+          </div>
+
+          <div class="live-dot">
+            <i></i> LIVE
+          </div>
         </div>
 
-    </section>
+        <div class="match-info">
+          <div>
+            <small>الحالة</small>
+            <strong id="caseTitle">مراجعة اللقطة</strong>
+          </div>
 
-
-    <!-- شاشة اختيار المراحل -->
-    <section id="levels" class="screen">
-
-        <header class="page-header">
-            <button id="backHome" class="icon-button">←</button>
-
-            <div>
-                <span>اختبار التحكيم</span>
-                <h2>المراحل</h2>
-            </div>
-        </header>
-
-        <div class="levels-progress">
-            <span>التقدم</span>
-            <strong id="levelsProgress">0 / 50</strong>
+          <div class="timer-box">
+            <span id="timeDisplay">00:00</span>
+          </div>
         </div>
 
-        <div id="levelsGrid" class="levels-grid"></div>
 
-    </section>
+        <!-- الملعب -->
+        <div class="broadcast">
 
+          <div class="broadcast-top">
+            <span>VAR MASTER</span>
+            <span id="cameraLabel">الكاميرا الرئيسية</span>
+          </div>
 
-    <!-- شاشة اللعب -->
-    <section id="game" class="screen">
+          <div id="pitch" class="pitch">
 
-        <header class="game-header">
+            <div class="center-line"></div>
+            <div class="center-circle"></div>
 
-            <div>
-                <span>المرحلة</span>
-                <strong id="stageNumber">01</strong>
+            <div class="penalty-box left-box"></div>
+            <div class="goal left-goal"></div>
+
+            <div class="penalty-box right-box"></div>
+            <div class="goal right-goal"></div>
+
+            <div class="ball" id="ball">⚽</div>
+
+            <div class="player p1" id="player1">
+              <span>10</span>
             </div>
 
-            <div class="score-display">
-                <span>النقاط</span>
-                <strong id="score">0</strong>
+            <div class="player p2" id="player2">
+              <span>9</span>
             </div>
 
-            <div>
-                <span>الصعوبة</span>
-                <strong id="difficulty">سهل</strong>
+            <div class="player p3" id="player3">
+              <span>5</span>
             </div>
 
-        </header>
-
-
-        <div class="video-area">
-
-            <div class="video-top">
-                <span class="live-dot"></span>
-                <span>مراجعة VAR</span>
-
-                <span id="minute">73:42</span>
+            <div class="player p4" id="player4">
+              <span>4</span>
             </div>
 
-            <div class="pitch">
-
-                <div class="pitch-lines"></div>
-
-                <div class="player player-one"></div>
-                <div class="player player-two"></div>
-                <div class="player player-three"></div>
-
-                <div id="incident" class="incident">
-                    ⚽
-                </div>
-
-                <div class="var-frame">
-                    <span>REVIEW</span>
-                </div>
-
+            <div class="player keeper" id="keeper">
+              <span>1</span>
             </div>
 
-            <div class="video-controls">
-                <button id="rewind">↶</button>
-                <div class="fake-progress">
-                    <span></span>
-                </div>
-                <button id="forward">↷</button>
+            <div class="referee" id="referee">●</div>
+
+            <div id="offsideLine" class="offside-line">
+              <span>خط التسلل</span>
             </div>
 
+            <div id="impact" class="impact">!</div>
+
+            <div id="varFrame" class="var-frame">
+              <div class="var-label">VAR</div>
+            </div>
+
+          </div>
+
+          <div class="broadcast-bottom">
+            <span id="playState">جاهز</span>
+            <span>● بث مباشر</span>
+          </div>
+
+        </div>
+
+
+        <!-- التحكم -->
+        <div class="controls">
+
+          <button id="playBtn" class="control-btn main-control">
+            ▶ تشغيل
+          </button>
+
+          <button id="replayBtn" class="control-btn">
+            🔁 إعادة
+          </button>
+
+          <button id="slowBtn" class="control-btn">
+            🐢 بطيء
+          </button>
+
+          <button id="varBtn" class="control-btn var-control">
+            📺 VAR
+          </button>
+
+        </div>
+
+
+        <div class="progress">
+          <div id="progressBar"></div>
         </div>
 
 
         <div class="case-card">
+          <div class="case-icon">⚖️</div>
 
-            <div class="case-label">
-                🚨 الحالة التحكيمية
-            </div>
-
-            <h2 id="caseTitle">
-                هل توجد مخالفة؟
+          <div>
+            <small>قرار الحكم المطلوب</small>
+            <h2 id="question">
+              ماذا سيكون قرارك؟
             </h2>
+          </div>
+        </div>
 
-            <p id="caseDescription">
-                راجع الحالة جيدًا ثم اتخذ قرارك.
-            </p>
+
+        <div id="answers" class="answers">
+
+          <button class="answer" data-answer="goal">
+            ⚽ هدف
+          </button>
+
+          <button class="answer" data-answer="no-goal">
+            🚫 لا هدف
+          </button>
+
+          <button class="answer" data-answer="offside">
+            🚩 تسلل
+          </button>
+
+          <button class="answer" data-answer="no-offside">
+            ✅ لا يوجد تسلل
+          </button>
+
+          <button class="answer" data-answer="penalty">
+            🟢 ركلة جزاء
+          </button>
+
+          <button class="answer" data-answer="no-penalty">
+            ❌ لا توجد ركلة جزاء
+          </button>
+
+          <button class="answer" data-answer="yellow">
+            🟨 بطاقة صفراء
+          </button>
+
+          <button class="answer" data-answer="red">
+            🟥 بطاقة حمراء
+          </button>
 
         </div>
 
 
-        <div id="answers" class="answers"></div>
+        <div id="result" class="result hidden">
+          <div id="resultIcon">✓</div>
 
-
-        <div id="resultBox" class="result-box hidden">
-
-            <div id="resultIcon" class="result-icon">✓</div>
-
-            <div>
-                <strong id="resultTitle">إجابة صحيحة</strong>
-                <p id="resultDescription"></p>
-            </div>
-
+          <div>
+            <strong id="resultTitle">إجابة صحيحة!</strong>
+            <p id="resultText"></p>
+          </div>
         </div>
 
 
-        <button id="nextButton" class="next-button hidden">
-            المرحلة التالية
-            <span>→</span>
+        <button id="nextBtn" class="next-btn hidden">
+          المرحلة التالية →
         </button>
 
-    </section>
+      </section>
 
 
-    <!-- الشاشة النهائية -->
-    <section id="final" class="screen final-screen">
+      <section id="finalScreen" class="screen final-screen">
 
         <div class="trophy">🏆</div>
 
-        <span class="eyebrow">اكتمل الاختبار</span>
+        <span class="final-label">انتهى التحدي</span>
 
-        <h1>أحسنت يا حكم!</h1>
+        <h1 id="finalRank">حكم ممتاز</h1>
 
-        <p>
-            أكملت جميع مراحل اختبار التحكيم.
-        </p>
+        <p id="finalMessage"></p>
 
-        <div class="final-score-card">
-
-            <span>نتيجتك</span>
-
-            <div>
-                <strong id="finalScore">0</strong>
-                <small>/ 50</small>
-            </div>
-
-            <div class="final-bar">
-                <span id="finalBar"></span>
-            </div>
-
-            <strong id="finalRank" class="final-rank">
-                حكم جيد
-            </strong>
-
-            <p id="finalMessage"></p>
-
+        <div class="final-score">
+          <strong id="finalScore">0</strong>
+          <span>/ 50</span>
         </div>
 
-        <button id="restartButton" class="primary-button">
-            إعادة الاختبار
+        <div class="final-stats">
+          <div>
+            <strong id="correctCount">0</strong>
+            <span>قرارات صحيحة</span>
+          </div>
+
+          <div>
+            <strong id="wrongCount">0</strong>
+            <span>قرارات خاطئة</span>
+          </div>
+
+          <div>
+            <strong>50</strong>
+            <span>لقطة</span>
+          </div>
+        </div>
+
+        <button id="restartBtn" class="primary-btn">
+          إعادة التحدي
         </button>
 
-    </section>
+      </section>
 
-</div>
+    </main>
 
+  </div>
 
-<!-- انتقال المرحلة -->
-<div id="transition">
+  <div id="transition" class="transition">
+    <div class="transition-logo">VAR MASTER</div>
+    <div class="transition-text">جاري الانتقال...</div>
+  </div>
 
-    <div class="transition-line"></div>
-
-    <span>VAR</span>
-
-    <strong id="transitionStage">
-        المرحلة 01
-    </strong>
-
-    <small>
-        جاري تجهيز الحالة...
-    </small>
-
-</div>
-
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
